@@ -1,0 +1,8 @@
+{
+    "serverName": "server_folder_name",
+    "screenName": "name_of_the_GNU_Screen",
+    "serverIp": "server_adress_to_display",
+    "serverRealIp": "server_adress",
+    "serverQueryPort": "query_port",
+    "backupFolder": "folder_contain_backups"
+}

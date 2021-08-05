@@ -1,0 +1,23 @@
+{
+  "name": "dev-bot",
+  "version": "1.0.0",
+  "description": "Discord Dev Bot, le bot de test & de reference, qui possede toutes les commandes",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Daguerian/discordBot.git"
+  },
+  "author": "Daguerian",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Daguerian/discordBot/issues"
+  },
+  "homepage": "https://github.com/Daguerian/discordBot#readme",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "minecraft-query": "^1.0.9"
+  }
+}

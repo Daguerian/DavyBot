@@ -1,0 +1,6 @@
+{
+    "prefix": "prefix_symbol",
+    "token": "bot_token",
+    "dmServer": "guild_id_for_receive_dms_in_str",
+    "dmChannel": "channel_id_in_the_guild_in_str"
+}
