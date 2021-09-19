@@ -1,7 +1,6 @@
 const Discord = require('discord.js');  //importation necessaire à l'embed seulement
 const { exec } = require("child_process")
-const {screenName, serverRealIp, serverName, serverQueryPort} = require('./config.json')
-const Query = require("minecraft-query")
+const {screenName, serverIp, serverName, serverQueryPort} = require('./config.json')
 var dateLog =  require("../../functions/dateLog.js");  //retourne [JJ/MM-hh:mm]
 
 module.exports = {
@@ -14,7 +13,7 @@ module.exports = {
 
         //fonction de lancement du serveur
         function startServer() {
-            exec(`screen -dmS ${screenName} && screen -S ${screenName} -X stuff "cd ~/${serverName}/ && ./start.sh\r"`, (error, stdout, stderr) => {
+            exec(`screen -dmS ${screenName} && screen -S ${screenName} -X stuff "cd ~/${serverName}/ && ./BeamMP-Server-linux\r"`, (error, stdout, stderr) => { 
                 
                 if (error) {
                     console.log(`${dateLog()} erreur: ${error}`);
@@ -38,9 +37,8 @@ module.exports = {
                     }
                     console.log(`${dateLog()} Lancement du serveur...`)  //pas d'erreur, "lancement du serveur..."
                     message.react("⌛")
-                    // message.channel.send('**lancement du serveur \nil prend généralement 40sec**')
 
-                    const query = new Query({host: serverRealIp, port: serverQueryPort, timeout: 2000});
+                    const query = new Query({host: serverIp, port: serverQueryPort, timeout: 2000});
                     //query pour recup les infos du serveur
                     setTimeout(checkLoopLatence, 7000)
                     function checkLoopLatence() {

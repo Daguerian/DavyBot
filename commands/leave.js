@@ -14,11 +14,11 @@ module.exports = {
             return message.reply('je ne suis pas en vocal :sweat_smile:')
         }
 		voiceChannel.leave()
-        .then( () => {
+        // .then( () => {
             message.react('✅')
-        })
-        .catch( err => {
-            message.channel.send(`Mmh... j'ai rencontré une erreur :thinking: \n||${err}||`)
-        })
+        // })
+        // .catch( err => {
+        //     message.channel.send(`Mmh... j'ai rencontré une erreur :thinking: \n||${err}||`)
+        // })
 
 }};

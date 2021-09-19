@@ -1,6 +1,6 @@
 const Discord = require('discord.js');  //importation necessaire à l'embed seulement
 const { exec } = require("child_process")   //commandes shell
-const {screenName, serverJoinIp, serverIp, serverQueryPort, serverName} = require('./config.json')  //recuperation nom du screen
+const {screenName, serverIp, serverRealIp, serverQueryPort, serverName} = require('./config.json')  //recuperation nom du screen
 const os = require('os')    //infos cpu, memoire, ect
 const Query = require("minecraft-query")
 
@@ -17,14 +17,14 @@ module.exports = {
                 const embed = new Discord.MessageEmbed()
                 .setColor('#F01E14')    //couleur du liseré
                 .setAuthor(`${serverName}`, message.client.user.displayAvatarURL())    //auteur & image, au dessus du titre
-                .setThumbnail(`https://eu.mc-api.net/v3/server/favicon/${serverJoinIp}`)    //image de vignette, en haut à droite, recupéré avec l'api mcsrvstat
-                .setFooter(`${serverJoinIp}`, 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/93/Grass_Block_JE7_BE6.png/revision/latest?cb=20200830143209') //footer, en bas de page, avec image
+                .setThumbnail(`https://eu.mc-api.net/v3/server/favicon/${serverIp}`)    //image de vignette, en haut à droite, recupéré avec l'api mcsrvstat
+                .setFooter(`${serverIp}`, 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/93/Grass_Block_JE7_BE6.png/revision/latest?cb=20200830143209') //footer, en bas de page, avec image
                 .setTitle('🔴 Serveur Fermé') //Titre
                 .addField('\u200B','\u200B')    //espace vide
                 message.channel.send(embed)
             }
             else {  //serveur ouvert
-                const q = new Query({host: serverIp, port: serverQueryPort, timeout: 2000});
+                const q = new Query({host: serverRealIp, port: serverQueryPort, timeout: 2000});
                     q.fullStat()    //promesse obtention des infos
                     .then((success) => {    //si reussite
                         let stats = success 
@@ -32,8 +32,8 @@ module.exports = {
                         .setColor('#0CF309')    //couleur du liseré
                         .setAuthor(`${serverName}`, message.client.user.displayAvatarURL())    //auteur & image, au dessus du titre
                         .setTitle('🔵 Serveur ouvert') //Titre
-                        .setThumbnail(`https://eu.mc-api.net/v3/server/favicon/${serverJoinIp}`)    //image de vignette, en haut à droite, recupéré avec l'api mcsrvstat
-                        .setFooter(`${serverJoinIp}`, 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/93/Grass_Block_JE7_BE6.png/revision/latest?cb=20200830143209') //footer, en bas de page, avec image
+                        .setThumbnail(`https://eu.mc-api.net/v3/server/favicon/${serverIp}`)    //image de vignette, en haut à droite, recupéré avec l'api mcsrvstat
+                        .setFooter(`${serverIp}`, 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/93/Grass_Block_JE7_BE6.png/revision/latest?cb=20200830143209') //footer, en bas de page, avec image
                         .addFields( //ajout de contenu
                             { name: 'Version', value: stats.version, inline: true },
                             { name: 'Map', value: stats.map, inline: true },

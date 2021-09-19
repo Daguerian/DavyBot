@@ -28,6 +28,12 @@ module.exports = {
 
                 for (let i = 1; i <= barkLoopNumber; i++) {    //spamme BARK le nombre de fois demandé
                     dmUser.send(`BARK BARK BARK BARK BARK`)
+                    .catch( err => {
+                        console.log(dateLog()+ dmUser.user.tag + " impossible a barker")
+                        message.channel.send("Je n'ai pas pu lui envoyer le message. iel m'a surement bloqué... :frowning:")
+                        //bug à coriger ici
+                    })
+                    // plante ici si la personne a bloquée le bot
                 }
                 console.log(dateLog()+ " "+ dmUser.user.tag + " barké " + barkLoopNumber + "x par " + message.author.tag)    //log console
                 message.react("✅")
