@@ -1,11 +1,11 @@
 # discordBot
-un bot discord, assez universel
+un bot discord, assez universel, toujours en dev
 
 #Features
 - gestion d'un serveur minecraft
-lance, ou stoppe le serveur dans un <a href="https://wiki.debian.org/fr/Screen">Screen</a>
-crée des backups, de tous les dossiers (et fichiers !) commençant par world (~/${serverName}/world*) vers un dossier contenant les backups
-recupere des infos sur le serveur, un fois lancé (joueurs, version, "ip" d'acces)
+Lance, ou stoppe le serveur dans un <a href="https://wiki.debian.org/fr/Screen">Screen</a>
+Crée des backups, de tous les dossiers (et fichiers !) commençant par world (~/${serverName}/world*) vers un dossier contenant les backups
+Recupere des infos sur le serveur, un fois lancé (joueurs, version, "ip" d'acces)
 
 - modifie son activité
 "joue à/regarde/écoute" <texte>
@@ -22,7 +22,7 @@ recupere des infos sur le serveur, un fois lancé (joueurs, version, "ip" d'acce
     
 # Fichiers de config
 
-**./config.json** - config du bot
+### **./config.json** - config du bot
 ```json
 {
     "prefix": "prefix_symbol",
@@ -32,7 +32,7 @@ recupere des infos sur le serveur, un fois lancé (joueurs, version, "ip" d'acce
 }
 ```
 
-**./commands/minecraft/config.json** - config du serveur minecraft
+### **./commands/minecraft/config.json** - config du serveur minecraft
 ```json
 {
     "serverName": "name_of_the_server",
@@ -43,3 +43,16 @@ recupere des infos sur le serveur, un fois lancé (joueurs, version, "ip" d'acce
     "backupFolder": "folder_contain_backups"
 }
 ```
+Désactiver la gestion du serveur minecraft:  
+    - rm commands/minecraft.js  
+    - rm minecraft/  
+    
+### **./commands/BeamMP/config.json** - config du serveur BeamMP (pas encore ajouté)
+```json
+    {
+    " ":" "
+    }
+```
+Désactiver la gestion d'un serveur BeamMP:  
+    - rm commands/beammp.js  
+    - rm beammp/  
