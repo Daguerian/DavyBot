@@ -1,6 +1,6 @@
 const Discord = require('discord.js');  //importation necessaire à l'embed seulement
 const { exec } = require("child_process")
-const {screenName, serverIp, serverName, serverQueryPort} = require('./config.json')
+const {screenName, serverRealIp, serverName, serverQueryPort} = require('./config.json')
 const Query = require("minecraft-query")
 var dateLog =  require("../../functions/dateLog.js");  //retourne [JJ/MM-hh:mm]
 
@@ -40,7 +40,7 @@ module.exports = {
                     message.react("⌛")
                     // message.channel.send('**lancement du serveur \nil prend généralement 40sec**')
 
-                    const query = new Query({host: serverIp, port: serverQueryPort, timeout: 2000});
+                    const query = new Query({host: serverRealIp, port: serverQueryPort, timeout: 2000});
                     //query pour recup les infos du serveur
                     setTimeout(checkLoopLatence, 7000)
                     function checkLoopLatence() {
