@@ -1,7 +1,17 @@
-# discordBot
-un bot discord, assez universel, toujours en dev
+# DavyBot
+un bot discord, assez universel, toujours en dev, qui me sert de base principale pour d'autres bots
 
-#Features
+# Installation
+(plus de precisions soon)  
+Installer nodejs, et npm  
+```bash
+npm install --save
+```
+et Paf, des chocapics
+plus qu'a le lancer avec ```node bot.js```  
+
+
+# Features
 - gestion d'un serveur minecraft
 Lance, ou stoppe le serveur dans un <a href="https://wiki.debian.org/fr/Screen">Screen</a>
 Crée des backups, de tous les dossiers (et fichiers !) commençant par world (~/${serverName}/world*) vers un dossier contenant les backups
