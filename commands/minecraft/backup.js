@@ -15,7 +15,6 @@ module.exports = {
     cooldown: 5,    //cooldown, en secondes
     doc: '`$backup` créé un backup \n `$backup list` liste les dates de backups disponibles',
     execute(message, args) {    //execution de la commande
-        console.log(args)
         if (args[1] == "list" || args[1] == "l") {    //affiche un embed de la liste des backups dispo, si demandé ($backup list)
             const backupsList = fs.readdirSync(backupFolder); //recupere la liste des dossiers dans les backups
 
