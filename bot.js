@@ -24,6 +24,7 @@ client.once('ready', () => {
 //event reception de message
 client.on('message', message => {
     
+    //envoi des DM dans le canal #dms associé au bot
     if (!message.content.startsWith(prefix) && message.channel.type == "dm" && !message.author.bot) {
         try {
             message.client.guilds.cache.get(dmServer).channels.cache.get(dmChannel).send(`[${message.author}]: ${message.content}`)
@@ -33,7 +34,6 @@ client.on('message', message => {
             console.log("DM reçu: " + message.author + ": " + message.content);
         }
     }
-    //envoi les DM non-commandes dans le canal DMs de Choco's Island                                                                guilde "Choco's Island"                     canal "#dms" Boby
 
     
     if (message.author.bot) return;  //ne fais rien si le message viens du bot lui-même
@@ -43,6 +43,7 @@ client.on('message', message => {
 
     // console.log(`[#${message.channel.name} - ${message.author.tag}] ${message.content}`) //affiche les messages en console
     
+    //*! Deprécié, à l'epoque d'un bug de mentions sur l'application mobile de discord
     try {   //correction bug tag mobile
         // let tags    //defini tags (une liste)
         let tags = message.content.split('<<@&440841925558534155>')//[1].split('>')   //crée une liste d'avant-apres
@@ -57,8 +58,10 @@ client.on('message', message => {
         catch(error){
             console.log(error);
         }
-    
-    if (!message.content.startsWith(prefix)) return;    //s'arrette ici si le message n'est pas une commande
+    //*! -----------------------------------------------------------------------------
+
+
+    if (!message.content.startsWith(prefix)) return;    //s'arrete ici si le message n'est pas une commande
 
     const args = message.content.slice(prefix.length).trim().split(' ');    //separe chaque mots, tel des arguments
     const commandName = args.shift().toLowerCase(); //recupere la commande depuis l'args[0], et le retire des args
