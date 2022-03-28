@@ -1,6 +1,8 @@
 {
-    "prefix": "prefix_symbol",
-    "token": "bot_token",
-    "dmServer": "guild_id_for_receive_dms_in_str",
-    "dmChannel": "channel_id_in_the_guild_in_str"
+    "prefix": "$",
+    "token": "NzE5OTMzNjQ2OTAzMDUwMjcx.Xt-odQ.YF8aPQ_lN5d9QunFjz_vaU_Gp4s",
+    "clientId": "719933646903050271",
+    "devGuildId": "505446149398986753",
+    "dmServer": "505446149398986753",
+    "dmChannel": "720028103606403125"
 }
