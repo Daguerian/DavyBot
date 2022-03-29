@@ -1,8 +1,21 @@
-const { Client, Intents } = require('discord.js');
+// mettre les events dans des fichiers séparés: https://discordjs.guide/creating-your-bot/event-handling.html#reading-event-files
+
+const fs = require('node:fs');
+const { Client, Collection, Intents } = require('discord.js');
 const {prefix, token, dmServer, dmChannel} = require('./config.json')    //importe fichier le configuration du bot
 var dateLog =  require("./functions/dateLog.js"); //retourne l'horodatage, pour logger dans la console
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+client.commands = new Collection();
+
+//recupere les commandes du dossier commands/
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	//Ajoute la commande à la Collection,
+	//avec son nom comme key, et le module.export comme value
+	client.commands.set(command.data.name, command);
+}
 
 
 //! connexion du bot aux serveurs de discord
@@ -14,16 +27,16 @@ client.once('ready', () => {
 client.on('interactionCreate', async interaction => {
     //si l'interraction  n'est pas reconnue
 	if (!interaction.isCommand()) return;
-    
-	const { commandName } = interaction;
-    
-    //detecte la commande
-	if (commandName === 'ping') {
-		await interaction.reply('Pong!');
-	} else if (commandName === 'server') {
-		await interaction.reply(`Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`);
-	} else if (commandName === 'user') {
-		await interaction.reply(`Your tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}`);
+
+	const command = client.commands.get(interaction.commandName);
+
+	if (!command) return;
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'J\'ai rencontré une erreur pendant que j\'executais la commande 😥', ephemeral: true });
 	}
 });
 

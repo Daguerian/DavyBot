@@ -2,7 +2,7 @@ const fs = require('fs')    //module fs, pour le chargement de fichiers
 const { Client, Intents } = require('discord.js');
 const {prefix, token, dmServer, dmChannel} = require('./config.json')    //importe fichier le configuration du bot
 var dateLog =  require("./functions/dateLog.js"); //retourne l'horodatage, pour logger dans la console
-const { name } = require('./commands/help')
+const { name } = require('./commands.deprecated/help')
 const reactionMessage = require('./functions/reactionMessages.js')    //importe script qui gere les réactions aux messages (contenus dans reactionMessages.json)
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 // const client = new Client({
@@ -33,7 +33,7 @@ client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
     
 	const { commandName } = interaction;
-    
+
     //detecte la commande
 	if (commandName === 'ping') {
 		await interaction.reply('Pong!');
