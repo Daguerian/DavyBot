@@ -1,8 +1,9 @@
 {
-    "prefix": "$",
-    "token": "NzE5OTMzNjQ2OTAzMDUwMjcx.Xt-odQ.YF8aPQ_lN5d9QunFjz_vaU_Gp4s",
-    "clientId": "719933646903050271",
-    "devGuildId": "505446149398986753",
-    "dmServer": "505446149398986753",
-    "dmChannel": "720028103606403125"
+    "token": "bot token",
+    "clientId": "id du bot",
+    "devGuildId": "id serveur dans laquelle deployer les commandes",
+    "dmServer": "id serveur dans lequel recevoir les DM du bot",
+    "dmChannel": "id du channel dans lequel recevoir les DM du bot",
+    "mcApiPort": "id du port de l'API du serveur minecraft en int, pas str comme actuellement",
+    "mcServerAddress": "adresse de connexion au serveur minecraft(dns ou ip:port)"
 }

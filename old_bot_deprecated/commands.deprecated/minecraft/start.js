@@ -2,7 +2,7 @@ const Discord = require('discord.js');  //importation necessaire à l'embed seul
 const { exec } = require("child_process")
 const {screenName, serverRealIp, serverName, serverQueryPort} = require('./config.json')
 const Query = require("minecraft-query")
-var dateLog =  require("../../functions/dateLog.js");  //retourne [JJ/MM-hh:mm]
+var dateLog =  require("../../../functions/dateLog.js");  //retourne [JJ/MM-hh:mm]
 
 module.exports = {
     name: 'start',    //nom de la commande, en accord avec son nom de fichier

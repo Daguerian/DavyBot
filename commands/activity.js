@@ -29,9 +29,16 @@ module.exports = {
         // botStatus = interaction.options.getString('status') || interaction.client.user.presence.status
         botActivity = interaction.options.getString('activité') || interaction.client.user.presence.activities[0].name
         botType = interaction.options.getString('type') || interaction.client.user.presence.activities[0].type
-        botUrl = interaction.options.getString('url') || interaction.client.user.presence.activities[0].url
+        botUrl = interaction.options.getString('url')// || interaction.client.user.presence.activities[0].url
 
-        await interaction.client.user.setPresence({ activities: [{ name: botActivity, type: botType, url: botUrl}] })
+        //verifie si botUrl est un url valide
+        if (botUrl && botUrl.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/)) {
+            await interaction.client.user.setPresence({ activities: [{ name: botActivity, type: botType, url: (botUrl||null)}] })
+        }
+        else {
+            await interaction.client.user.setPresence({ activities: [{ name: botActivity, type: botType}] })
+        }
+
         interaction.reply('Activité modifiée ✅')
 	},
 };

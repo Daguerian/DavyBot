@@ -1,7 +1,16 @@
 const fs = require('node:fs');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { clientId, devGuildId, token } = require('./config.json');
+const { clientId, token } = require('./config.json');
+const devGuildId = getGuildId()
+
+//recupere l'id saisi en argument de lancement du script, ou celui dans le fichier config
+function getGuildId() {
+	if (isNaN(process.argv[0])) {
+		return require('./config.json').devGuildId;
+	}
+	return process.argv[0];
+}
 
 const commands = [];
 
