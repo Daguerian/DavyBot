@@ -2,10 +2,10 @@
 
 const fs = require('node:fs');
 const { Client, Collection, Intents } = require('discord.js');
-// const {token, dmServer, dmChannel} = require('./config.json')    //importe fichier le configuration du bot
+// // const {token, dmServer, dmChannel} = require('./config.json')    //importe fichier le configuration du bot
 const {token} = require('./config.json')    //importe fichier le configuration du bot
 var {dateLog} =  require("./functions/dateLog.js"); //retourne l'horodatage, pour logger dans la console
-const listeReactionsMessages = require('./reactionMessages.json')
+// // const listeReactionsMessages = require('./reactionMessages.json')
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 client.commands = new Collection();
@@ -92,6 +92,9 @@ client.on('interactionCreate', async interaction => {
 
 //! lancement, connexion du bot avec son token
 client.login(token)
+.catch(err => {
+	console.log(dateLog()+ " Erreur de connexion: "+ err)
+})
 
 
 //! Ferme la connexion proprement lorsque l'on quitte le programme
