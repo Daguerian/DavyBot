@@ -29,7 +29,7 @@ Les champs de `dmServer` et `dmChannel` sont actuellement inutiles
 
 ## Lancement
 Deploiement des commandes:
-`npm run deploy`
+`npm run deploy`  
 ça deploie les commandes du dossier `commands/` via le script `deploy-commands.js`
 
 Lancement du bot
