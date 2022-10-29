@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder  } = require('discord.js');
 const https = require('https')
 const axios = require('axios')		//requete http
 var crypto = require('crypto'); 	//pour chiffrer le token
@@ -14,27 +14,29 @@ module.exports = {
 		.setDescription('commandes liées au serveur minecraft')
 		.addStringOption(option =>
 			option.setName('commande')
-				.setDescription('commande')
 				.setRequired(true)
-				.addChoice('start', 'start')
-				.addChoice('stop', 'stop')
-				.addChoice('info', 'info')
-				.addChoice('mods', 'mods')
-				.addChoice('list', 'list')
+				.setDescription('commande')
+				.addChoices(
+					{ name: 'start', value: 'start' },
+					{ name: 'stop', value: 'stop' },
+					{ name: 'info', value: 'info' },
+					{ name: 'mods', value: 'mods' },
+					{ name: 'list', value: 'list' },
+				)
 		),
 	async execute(interaction) {
 
-		// // //! Commande mods
-		// // if (interaction.options.getString('commande') == 'mods') {
-		// // 	return interaction.reply('Une liste de mods utiles: \nhttps://dl.fcsn.fr/modsMinecraft')
-		// // }
+		//! Commande mods
+		if (interaction.options.getString('commande') == 'mods') {
+			return interaction.reply('Une liste de mods utiles: \nhttps://dl.fcsn.fr/modsMinecraft')
+		}
 
 		//! les autres commandes
-		autoCommnds = []
+		autoCommands = []
 		// // var reponseApi = "";	//initialise en str vide
 		
 		//! reponse au message, en attendant la reponse de l'api
-		embed = new MessageEmbed()
+		embed = new EmbedBuilder()
 		switch (interaction.options.getString('commande')) {
 			case 'start':
 				embed.setTitle('🟢 Lancement du serveur...')
@@ -104,7 +106,7 @@ module.exports = {
 		//! Envoi de la requete
 		axios({
 			method: 'post',
-			url: 'https://localhost:'+mcApiPort+'/'+interaction.options.getString('commande'),
+			url: 'http://localhost:'+mcApiPort+'/'+interaction.options.getString('commande'),
 			data: {
 				'token':  hashedToken,
 				// token: interaction.client.token
@@ -141,11 +143,11 @@ module.exports = {
 					if (res.data['status'] == 'OK') {
 						// defini la var playerListField, en liste str avec des \n si ya des joueurs, ou en \u200b si personne n'est connecté pour ne pas envoyer du vide
 						var playerListField = res.data['content']['players'].map(player => player + '\n').join('') || '\u200b'
-						// embed = new MessageEmbed()
+						// embed = new EmbedBuilder()
 						embed.setTitle('Joueurs Connectés: ')
 						// .setColor('#fcf80f')
 						.setThumbnail('https://eu.mc-api.net/v3/server/favicon/'+mcServerAddress)
-						.addField( `${res.data['content']['onlinePlayers']}/${res.data['content']['maxPlayers']}`, playerListField)	//erreur, value vide si ya pas un caractere avant (wtf ?) donc \r, ça se voir pas mais ça marche c:
+						.addFields( {name: `${res.data['content']['onlinePlayers']}/${res.data['content']['maxPlayers']}`, value: playerListField})	//erreur, value vide si ya pas un caractere avant (wtf ?) donc \r, ça se voir pas mais ça marche c:
 						.setTimestamp()
 						.setFooter( {text: mcServerAddress, iconURL: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/93/Grass_Block_JE7_BE6.png'} )
 						// interaction.reply(`Joueurs connectés: ${res.data['content']['onlinePlayers']}/${res.data['content']['maxPlayers']} \n ${res.data['content']['players'].map(player => player + '\n')}`);
@@ -169,10 +171,24 @@ module.exports = {
 			}
 		})
 		.catch(error => {
-			// console.error(error)
+			console.error(dateLog()+ error.code)
+			messageReply = error.message	//par defaut
+
+			if (error.code == 'ECONNREFUSED') {
+				messageReply = "Impossible de se connecter à l'API. \nConnexion refusée"
+			}
+
+			if (error.code == "CERT_HAS_EXPIRED") {
+				messageReply = "Impossible de se connecter à l'API. \nCertificat expiré"
+			}
+
+			if (error.code == "ECONNRESET") {	//mauvais protocole ? (http au lieu de https)
+				messageReply = "Impossible de se connecter à l'API. \nConnexion réinitialisée"
+			}
+			
+			// Envoie le message d'erreur
 			interaction.fetchReply()
-			.then(message => interaction.editReply("Erreur: "+error) ); 
-			// interaction.reply("error: "+error)
+			.then(message => interaction.editReply({embeds: [new EmbedBuilder().setTitle(messageReply).setColor("ff0000")]}) ); 
 		})
 		
 

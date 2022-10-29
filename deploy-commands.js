@@ -23,7 +23,7 @@ for (const file of commandFiles) {
 }
 
 //Initialise la connexion REST avec le token
-const rest = new REST({ version: '9' }).setToken(token);
+const rest = new REST({ version: '10' }).setToken(token);
 
 //Deploie la liste des commandes du bot au serveur Discord, pour la guilde saisie
 rest.put(Routes.applicationGuildCommands(clientId, devGuildId), { body: commands })

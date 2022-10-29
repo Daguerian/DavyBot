@@ -1,13 +1,21 @@
 // mettre les events dans des fichiers séparés: https://discordjs.guide/creating-your-bot/event-handling.html#reading-event-files
 
 const fs = require('node:fs');
-const { Client, Collection, Intents } = require('discord.js');
-// // const {token, dmServer, dmChannel} = require('./config.json')    //importe fichier le configuration du bot
+const { Client, GatewayIntentBits, Partials, Collection, ChannelType} = require('discord.js');
+
 const {token} = require('./config.json')    //importe fichier le configuration du bot
 var {dateLog} =  require("./functions/dateLog.js"); //retourne l'horodatage, pour logger dans la console
-// // const listeReactionsMessages = require('./reactionMessages.json')
+const listeReactionsMessages = require('./reactionMessages.json')	//liste des réponses automatiques
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ 
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.DirectMessages,
+		GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates,
+		GatewayIntentBits.GuildMessages],
+	partials: [Partials.Channel, Partials.User, Partials.Message]
+});
+//Liste des Intents: https://discord.com/developers/docs/topics/gateway#list-of-intents
+//doc Partials: https://discord.js.org/#/docs/discord.js/14.0.2/typedef/Partials
+
 client.commands = new Collection();
 
 //recupere les commandes du dossier commands/
@@ -24,6 +32,7 @@ client.on('ready', () => {
 	console.log(dateLog()+ " Connecté en tant que "+ client.user.tag)
 	// console.log(client.ws.gateway)
 })
+
 
 //! lors de la deconnexion
 client.on('shardDisconnect', reason => {
@@ -43,14 +52,27 @@ client.on('shardResume', id => {
 client.addListener('error', (message) => {
 	console.log(message)
 })
-//! réponses automatique à certains message (like "quoi" -> feur, "possible" -> gif carte kiwi)
+
+//! Traitement des messages simples
 client.on('messageCreate', message => {
-	console.log(message)
 	if (message.author.bot) return;
-	for (reponse in listeReactionsMessages) { //pour chaques reponses connues dans le dico des reponses,
-		if (message.content.toLowerCase().split(' ').includes(reponse)) message.channel.send(dictionnaireReponses[reponse]);
-		//passe le message en minuscule, le decoupe mots par mots, et verifie si un des mots correspond à une reponse
+
+	// DM reçus
+	if (message.channel.type == ChannelType.DM) {
+		console.log(dateLog()+ " Message privé de "+ message.author.username +": "+ message.content)
 	}
+
+	// Message de guilde
+	if (message.channel.type == ChannelType.GuildText) {
+		console.log(dateLog()+ " Message de "+ message.author.username +" dans "+ message.channel.name +": "+ message.content)
+		
+		for (reponse in listeReactionsMessages) { //pour chaques reponses connues dans le dico des reponses,
+			if (message.content.toLowerCase().split(' ').includes(reponse)) message.channel.send(listeReactionsMessages[reponse]);
+			//passe le message en minuscule, le decoupe mots par mots, et verifie si un des mots correspond à une reponse
+		}
+	}
+
+	// console.log(dateLog()+ " Message reçu: "+ message.content)
 
 	//TODO: restaurer le json avec les corresponances ? + securiser (message d'erreur en cas d'absence du fichier)
 	//TODO: + ajout possible via une commande, donc ptetre plutot une base de donnée (à moins qu'on edite le fichier)
@@ -59,8 +81,9 @@ client.on('messageCreate', message => {
 
 //! execution d'une commande slash
 client.on('interactionCreate', async interaction => {
-	//si l'interraction  n'est pas reconnue
-	if (!interaction.isCommand()) return;
+
+	if (interaction.type !== 2) return;	//2 = ApplicationCommand
+	// doc: https://discord-api-types.dev/api/discord-api-types-v10/enum/InteractionType
 	
 	//recupere la commande demandée
 	const command = client.commands.get(interaction.commandName);
@@ -86,8 +109,6 @@ client.on('interactionCreate', async interaction => {
 			})
 	}
 });
-
-
 
 
 //! lancement, connexion du bot avec son token

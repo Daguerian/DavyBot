@@ -8,10 +8,12 @@ module.exports = {
             option.setName('status')
                 .setDescription('le statut à modifier')
                 .setRequired(true)
-                .addChoice('🟢 online', 'online')
-                .addChoice('🟡 idle', 'idle')
-                .addChoice('🔴 dnd', 'dnd')
-                .addChoice('⚪ invisible', 'invisible')
+                .setChoices(
+                    { name:'🟢 online', value: 'online' },
+                    { name:'🟡 idle', value: 'idle' },
+                    { name:'🔴 dnd', value: 'dnd' },
+                    { name:'⚪ invisible', value: 'invisible' },
+                )
         ),
 	async execute(interaction) {
 
