@@ -1,1 +1,5 @@
 node_modules
+cert/*.cer
+cert/*.crt
+cert/*.key
+config.conf

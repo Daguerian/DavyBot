@@ -1,33 +1,48 @@
-const Discord = require('discord.js');  //importation necessaire à l'embed seulement
-var dateLog =  require("../functions/dateLog.js");
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { ChannelType, EmbedBuilder } = require('discord.js');
 
 module.exports = {
-    name: 'send',    //nom de la commande, en accord avec son nom de fichier
-    aliases: ['send'],   //alias de la commande, pour l'appeler (sur discord$) de plusieurs manieres
-    description: 'envoie un message dans le canal demandé',
-    usage: '$args <here/id_canal>',      //syntaxe, affichée si la commande est saisie mais incorrecte et dans l'help
-    inGuild: true,  //utilisable en guild
-    inDMs: true,    //utilisable en DM
-    args: 2,     //demande obligatoirement des arguments
-    doc: '$send here <message> envoi un message dans ce même channel, $send <id_chanel> <message> l\'envoi dans le channel demandé',    //une documentation supplementaire, dans le $help commande
-	execute(message, args) {    //execution de la commande, ici une template embed
-        
-        let channelToSend = message.guild.channels.resolve(args[0]) || message.mentions.channels.first()
+	data: new SlashCommandBuilder()
+		.setName('send')
+		.setDescription('envoie un message dans le canal demandé')
+		.addChannelOption(option =>
+			option.setName('channel')
+			.setDescription('le canal dans lequel envoyer le message')
+			.setRequired(true)
+		)
+		.addStringOption(option =>
+			option.setName('message')
+			.setDescription('le message à envoyer (texte ou url)')
+			.setRequired(true)
+		),
+	async execute(interaction) {
 
-        if (channelToSend != 'undefined' && channelToSend != null) {
-            channelToSend.send(args.slice(1).join(" "))
-            .then( () => {
-                message.react("✅")
-                console.log(`${dateLog()} Message envoyé de ${message.author.tag} dans ${channelToSend.guild} #${channelToSend.name}:\n"${args.slice(1).join(" ")}"`);
-            })
-            .catch(err => {
-                message.react('❌')
-                message.channel.send(`Je n'ai pas pu envoyer le message dans <#${channelToSend.id}>. Je n'ai peut être pas les droits... :frowning:`);
-            })
-        }
-        else {
-            message.channel.send("Je ne reconnais pas ce canal sur ce serveur :thinking:")
-            message.react('❌')
-        }
-    }
+		//verif si le channel est visible
+		if (!interaction.options.getChannel('channel').viewable) {
+			await interaction.reply('je ne peux pas envoyer de message dans ce channel 😔');
+			return;
+		}
+		//verif si le channel est un channel textuel
+		if (!interaction.options.getChannel('channel').type == ChannelType.GuildText) {
+			await interaction.reply('Ce n\'est pas un canal textuel !');
+			return;
+		}
+
+		try {
+			await interaction.options.getChannel('channel').send(interaction.options.getString('message'))
+		}
+		catch {
+			await interaction.reply('Je n\'ai pas pu envoyer de message dans ce channel 🤔');
+			return;
+		}
+
+		//Message de confirmation, visible seulement par l'utilisateur
+		embed = new EmbedBuilder()
+			.setColor('#0099ff')
+			.setTitle('#'+interaction.options.getChannel('channel').name)
+			.setDescription(interaction.options.getString('message'))
+			.setTimestamp()
+		await interaction.reply({ embeds: [embed] , ephemeral: true});
+		// await interaction.reply({content: '✅ Message envoyé dans `#'+interaction.options.getChannel('channel').name+"`:\n> "+interaction.options.getString('message'), ephemeral: true });
+	},
 };

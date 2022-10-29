@@ -1,47 +1,51 @@
-const Discord = require('discord.js');  //importation necessaire à l'embed seulement
-var dateLog =  require("../functions/dateLog.js");
-const aliasWatch = ['watching','watch','regarde']
-const aliasPlay = ['playing','play','joue']
-const aliasListen = ['listening','listen','ecoute']
+const { SlashCommandBuilder} = require('@discordjs/builders');
+const {ActivityType } = require('discord.js');  //types d'activités (changés depuis la v14) https://discord.js.org/#/docs/main/stable/typedef/ActivityType
+// const { ApplicationCommandType, ApplicationCommandOptionType } = require('discord.js');
 
 module.exports = {
-    name: 'activity',    //nom de la commande, en accord avec son nom de fichier
-    aliases: ['act'],   //alias de la commande, pour l'appeler (sur discord$) de plusieurs manieres
-    description: 'change d\'activité',
-    usage: '$activity <type> <activité>',      //syntaxe, affichée si la commande est saisie mais incorrecte et dans l'help
-    inGuild: true,  //utilisable en guild
-    inDMs: true,    //utilisable en DM
-    args: true,     //demande obligatoirement des arguments
-    doc: 'Types d\'activités: \n*- watch \n- play \n- listen* \nsupprimer le Statut: \n$activity del',    //une documentation supplementaire, dans le $help commande
-    execute(message, args) {    //execution de la commande, ici une template embed
-        function setActivity(actType) { //fonction pour le changement d'activité
-        message.client.user.setPresence({activity: {name: nomActivite, type: actType}});
-    }
-    const actType = args.shift().toLowerCase()  //recupere le 1er mot
-    const nomActivite = args.join(' ')
+	data: new SlashCommandBuilder()
+		.setName('activity')
+        // .setType(ApplicationCommandType.ChatInput)
+		.setDescription('modifie l\'activité du bot')
+        .addIntegerOption(option =>
+            option.setName('type')
+            // .setType(ApplicationCommandOptionType.Integer)
+            .setDescription('selectionne le type d\'activité du bot')
+            .setRequired(true)
+            .addChoices(    //Type Integer
+                { name:'joue', value: ActivityType.Playing },
+                { name:'écoute', value: ActivityType.Listening },
+                { name:'regarde', value: ActivityType.Watching },
+                // { name:'stream', value: ActivityType.Streaming },
+                // { name:'custom', value:  ActivityType.Custom },
+                { name:'compete', value: ActivityType.Competing },
+            )
+        )
+        .addStringOption(option =>
+            option.setName('activité')
+            .setDescription('saisie l\'activité du bot')
+            .setRequired(true)
+        )
+        .addStringOption(option =>
+            option.setName('url')
+            .setDescription('saisie l\'url de l\'activité, pour le type stream uniquement')
+            .setRequired(false)
+        ),
+	async execute(interaction) {
+        // botStatus = interaction.options.getString('status') || interaction.client.user.presence.status
+        botActivity = interaction.options.getString('activité')// || interaction.client.user.presence.activities[0].name
+        botType = interaction.options.getInteger('type')// || interaction.client.user.presence.activities[0].type
+        botUrl = interaction.options.getString('url')// || interaction.client.user.presence.activities[0].url
 
-        if (aliasPlay.includes(actType)) {
-            setActivity('PLAYING')
-            console.log(`${dateLog()} activity: joue à ${nomActivite}`)
-            message.react("✅")
-        }
-        else if (aliasWatch.includes(actType)) {
-            setActivity('WATCHING')
-            console.log(`${dateLog()} activity: regarde ${nomActivite}`)
-            message.react("✅")
-        }
-        else if (aliasListen.includes(actType)) {
-            setActivity('LISTENING')
-            console.log(`${dateLog()} activity: écoute ${nomActivite}`)
-            message.react("✅")
-        }
-        else if (actType == 'del') {
-            setActivity('')
-            console.log(`${dateLog()} activity: supprimé`)
-            message.react("✅")
+        //verifie si botUrl est un url valide
+        if (botUrl && botUrl.match(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/)) {
+            await interaction.client.user.setPresence({ activities: [{ name: botActivity, type: botType, url: (botUrl||null)}] })
+            
         }
         else {
-            message.channel.send('je ne connais pas ce type d\'activité... :thinking: \nverifie le `$help activity` !')
+            await interaction.client.user.setPresence({ activities: [{ name: botActivity, type: botType}] })
         }
-    }
+
+        interaction.reply('Activité modifiée ✅')
+	},
 };

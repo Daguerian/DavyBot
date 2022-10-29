@@ -15,7 +15,6 @@ module.exports = {
     cooldown: 5,    //cooldown, en secondes
     doc: '`$backup` créé un backup \n `$backup list` liste les dates de backups disponibles',
     execute(message, args) {    //execution de la commande
-        console.log(args)
         if (args[1] == "list" || args[1] == "l") {    //affiche un embed de la liste des backups dispo, si demandé ($backup list)
             const backupsList = fs.readdirSync(backupFolder); //recupere la liste des dossiers dans les backups
 
@@ -34,6 +33,7 @@ module.exports = {
         else if (args[1] == "" || !args[1]) {  //aucun arguments, donc créé un backup
 
             console.log(`${dateLog()} Lancement backup du serveur`)
+            message.react("⌛")
             //création du nom du dossier
             var date = new Date();
             let J = ("0" + date.getDate()).slice(-2);   //0 + la date, puis recupere que les 2 derners caracteres
@@ -47,11 +47,15 @@ module.exports = {
                 if (error) {    //erreur lors de la création
                     console.log(`Impossible de créer le dossier`)
                     console.log(`Erreur: ${error}`)
+                    message.reactions.resolve("⌛").remove()
+                    message.react("❌")
                     return message.channel.send("Impossible de créer le dossier du Backup.")
                 }
                 if (stderr) {   //erreur lors de la création
                     console.log(`Impossible de créer le dossier (stderr)`)
                     console.log(`Erreur: ${error}`)
+                    message.reactions.resolve("⌛").remove()
+                    message.react("❌")
                     return message.channel.send("Impossible de créer le dossier du Backup.")
                 }
 
@@ -62,15 +66,21 @@ module.exports = {
                     if (error) {    //erreur lors de la copie
                         console.log("Impossible de copier le.s dossier.s world.s")
                         console.log(`erreur: ${error}`)
+                        message.reactions.resolve("⌛").remove()
+                        message.react("❌")
                         return message.channel.send("Impossible de terminer le backup")
                     }
                     if (stderr) {   //erreur lors de la copie
                         console.log("Impossible de copier le.s dossier.s world.s (stderr)")
                         console.log(`erreur: ${error}`)
+                        message.reactions.resolve("⌛").remove()
+                        message.react("❌")
                         return message.channel.send("Impossible de terminer le backup")
                     }
                     //copie terminée
                     console.log("Backup terminé")
+                    message.reactions.resolve("⌛").remove()
+                    message.react("✅")
                     return message.channel.send("Backup terminé. \n`$minecraft backup list` pour consulter la date des backups existants")
                 })
 

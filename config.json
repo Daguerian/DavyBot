@@ -1,6 +1,9 @@
 {
-    "prefix": "prefix_symbol",
-    "token": "bot_token",
-    "dmServer": "guild_id_for_receive_dms_in_str",
-    "dmChannel": "channel_id_in_the_guild_in_str"
+    "token": "bot token",
+    "clientId": "id du bot",
+    "devGuildId": "id serveur dans laquelle deployer les commandes",
+    "dmServer": "id serveur dans lequel recevoir les DM du bot",
+    "dmChannel": "id du channel dans lequel recevoir les DM du bot",
+    "mcApiPort": "id du port de l'API du serveur minecraft en int, pas str comme actuellement",
+    "mcServerAddress": "adresse de connexion au serveur minecraft(dns ou ip:port)"
 }

@@ -1,110 +1,134 @@
-const fs = require('fs')    //module fs, pour le chargement de fichiers
-const Discord = require('discord.js')
-const {prefix, token, dmServer, dmChannel} = require('./config.json')    //importe fichier le configuration du bot
-var dateLog =  require("./functions/dateLog.js"); //retourne l'horodatage, pour logger dans la console
-const { name } = require('./commands/help')
-const reactionMessage = require('./functions/reactionMessages.js')    //importe script qui gere les réactions aux messages (contenus dans reactionMessages.json)
-const client = new Discord.Client()
-client.commands = new Discord.Collection()
-const cooldowns = new Discord.Collection();
+// mettre les events dans des fichiers séparés: https://discordjs.guide/creating-your-bot/event-handling.html#reading-event-files
 
-//importe les commandes, depuis chaque fichiers js
+const fs = require('node:fs');
+const { Client, GatewayIntentBits, Partials, Collection, ChannelType} = require('discord.js');
+
+const {token} = require('./config.json')    //importe fichier le configuration du bot
+var {dateLog} =  require("./functions/dateLog.js"); //retourne l'horodatage, pour logger dans la console
+const listeReactionsMessages = require('./reactionMessages.json')	//liste des réponses automatiques
+
+const client = new Client({ 
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildPresences, GatewayIntentBits.DirectMessages,
+		GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates,
+		GatewayIntentBits.GuildMessages],
+	partials: [Partials.Channel, Partials.User, Partials.Message]
+});
+//Liste des Intents: https://discord.com/developers/docs/topics/gateway#list-of-intents
+//doc Partials: https://discord.js.org/#/docs/discord.js/14.0.2/typedef/Partials
+
+client.commands = new Collection();
+
+//recupere les commandes du dossier commands/
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
-    client.commands.set(command.name, command)
+	const command = require(`./commands/${file}`);
+	//Ajoute la commande à la Collection,
+	//avec son nom comme key, et le module.export comme value
+	client.commands.set(command.data.name, command);
 }
 
-
-//connexion à Discord
-client.once('ready', () => {
-    console.log(`connecté en tant que ${client.user.tag}`)
+//! connexion du bot aux serveurs de discord
+client.on('ready', () => {
+	console.log(dateLog()+ " Connecté en tant que "+ client.user.tag)
+	// console.log(client.ws.gateway)
 })
 
-//event reception de message
-client.on('message', message => {
-    
-    if (!message.content.startsWith(prefix) && message.channel.type == "dm" && !message.author.bot) {
-        try {
-            message.client.guilds.cache.get(dmServer).channels.cache.get(dmChannel).send(`[${message.author}]: ${message.content}`)
-        }
-        catch(error) {
-            console.log(dateLog()+" Impossible d'envoyer le DM reçu dans le canal des DMs");
-            console.log("DM reçu: " + message.author + ": " + message.content);
-        }
-    }
-    //envoi les DM non-commandes dans le canal DMs de Choco's Island                                                                guilde "Choco's Island"                     canal "#dms" Boby
 
-    
-    if (message.author.bot) return;  //ne fais rien si le message viens du bot lui-même
-
-    if (!message.content.startsWith(prefix)) return reactionMessage.execute(message)    //detecte si c'est un simple message, et y réagit si il doit y reagir
-
-
-    // console.log(`[#${message.channel.name} - ${message.author.tag}] ${message.content}`) //affiche les messages en console
-    
-    try {   //correction bug tag mobile
-        // let tags    //defini tags (une liste)
-        let tags = message.content.split('<<@&440841925558534155>')//[1].split('>')   //crée une liste d'avant-apres
-        let tagsReturn = '' //defini en str
-        tags.splice(0,1)    //supprime le 1er terme, n'étant pas un id
-        for (id in tags) {
-            tags[id] = tags[id].split(">")[0]   //redecoupe chaque terme, avant le ">" pour ne garder que l'id
-            tagsReturn += `<@!${tags[id]}> `    // et l'ajoute dans une str, renvoyée sur Discord
-        }
-        if (tagsReturn.length) message.channel.send(tagsReturn)
-        }
-        catch(error){
-            console.log(error);
-        }
-    
-    if (!message.content.startsWith(prefix)) return;    //s'arrette ici si le message n'est pas une commande
-
-    const args = message.content.slice(prefix.length).trim().split(' ');    //separe chaque mots, tel des arguments
-    const commandName = args.shift().toLowerCase(); //recupere la commande depuis l'args[0], et le retire des args
-
-    const command = client.commands.get(commandName)    //recupere la commande via son nom ou son alias
-        || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-
-    if (!command) return message.channel.send('je n\'ai pas reconnu ta commande.\nliste complete `$help`');
-    //retourne commande inconnue si la commande n'est pas dans la liste des commandes, ni en alias
-
-    if (args.length < command.args) { //si la commande necessite plus d'arguments que fournis
-        if (command.args == 1) return message.channel.send(`\`${command.name}\` demande ${command.args} argument obligatoire, ${message.author} ! \nsyntaxe: \`${command.usage}\`\nTu peux aussi consulter le \`$help ${command.name}\``);    //singulier
-        else return message.channel.send(`\`${command.name}\` demande ${command.args} arguments obligatoires, ${message.author} ! \nsyntaxe: \`${command.usage}\`\nTu peux aussi consulter le \`$help ${command.name}\``);    //pluriel
-    }
-    if (!command.inGuild && message.channel.type === 'text') {  //si la commande est demandée en guild, mais non autorisée en guild
-        return message.channel.send(':warning: Je ne peux pas faire ça sur un serveur !')
-    }
-    if (!command.inDMs && message.channel.type === 'dm') {      //si la commande est demandée en DM, mais non autorisée en DM
-        return message.channel.send(':warning: Je ne peux pas faire ça en DM \nallons sur un serveur :globe_with_meridians:')
-    }
-    
-    //gestion cooldown
-    if (!cooldowns.has(command.name)) {
-        cooldowns.set(command.name, new Discord.Collection());
-    }
-    const now = Date.now();
-    const timestamps = cooldowns.get(command.name);
-    const cooldownAmount = (command.cooldown || 1) * 1000;  //1sec, cooldown par defaut, pour tout
-    
-    if (timestamps.has(message.author.id)) {
-    	const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-        if (now < expirationTime) {
-            const timeLeft = (expirationTime - now) / 1000;
-            return message.reply(`attend encore ${timeLeft.toFixed(1)}s avant de refaire \`${command.name}\``);
-    }   }
-    timestamps.set(message.author.id, now);
-    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-    
-    //execution de la commande
-    try {
-        command.execute(message, args);
-    } catch (error) {
-        console.log(error)
-        message.reply(`je n\'ai pas pu executer la commande :frowning: \n erreur: ||\`${error}\`||`)
-    }
+//! lors de la deconnexion
+client.on('shardDisconnect', reason => {
+	console.log(dateLog()+ " Déconnecté")
 })
-//lancement, connexion du bot avec son token
+
+client.on('shardReconnecting', id => {
+	console.log(dateLog()+ " Reconnexion ...")
+})
+
+client.on('shardResume', id => {
+	console.log(dateLog()+ " Connecté !")
+})
+
+
+
+client.addListener('error', (message) => {
+	console.log(message)
+})
+
+//! Traitement des messages simples
+client.on('messageCreate', message => {
+	if (message.author.bot) return;
+
+	// DM reçus
+	if (message.channel.type == ChannelType.DM) {
+		console.log(dateLog()+ " Message privé de "+ message.author.username +": "+ message.content)
+	}
+
+	// Message de guilde
+	if (message.channel.type == ChannelType.GuildText) {
+		console.log(dateLog()+ " Message de "+ message.author.username +" dans "+ message.channel.name +": "+ message.content)
+		
+		for (reponse in listeReactionsMessages) { //pour chaques reponses connues dans le dico des reponses,
+			if (message.content.toLowerCase().split(' ').includes(reponse)) message.channel.send(listeReactionsMessages[reponse]);
+			//passe le message en minuscule, le decoupe mots par mots, et verifie si un des mots correspond à une reponse
+		}
+	}
+
+	// console.log(dateLog()+ " Message reçu: "+ message.content)
+
+	//TODO: restaurer le json avec les corresponances ? + securiser (message d'erreur en cas d'absence du fichier)
+	//TODO: + ajout possible via une commande, donc ptetre plutot une base de donnée (à moins qu'on edite le fichier)
+});
+
+
+//! execution d'une commande slash
+client.on('interactionCreate', async interaction => {
+
+	if (interaction.type !== 2) return;	//2 = ApplicationCommand
+	// doc: https://discord-api-types.dev/api/discord-api-types-v10/enum/InteractionType
+	
+	//recupere la commande demandée
+	const command = client.commands.get(interaction.commandName);
+
+	if (!command) return;
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+			await interaction.reply({ content: 'J\'ai rencontré une erreur pendant que j\'executais la commande 😥', ephemeral: true })
+			.catch( err => {
+				if (err.code == 40060) {	//DiscordAPIError: Interaction has already been acknowledged
+					//https://discord.com/developers/docs/topics/opcodes-and-status-codes
+					//correspond à un reply deja effectué
+
+					//donc on fetch le reply deja effectué, pour ensuite le modifier
+					interaction.fetchReply()
+					.then( message => {
+						interaction.editReply({ content: 'J\'ai rencontré une erreur pendant que j\'executais la commande 😥', ephemeral: true })
+					});
+				}
+			})
+	}
+});
+
+
+//! lancement, connexion du bot avec son token
 client.login(token)
+.catch(err => {
+	console.log(dateLog()+ " Erreur de connexion: "+ err)
+})
+
+
+//! Ferme la connexion proprement lorsque l'on quitte le programme
+process.on('SIGINT', () => {	//CTRL +C
+	console.log('\n'+ dateLog()+ ' Deconnexion...')
+	client.destroy()
+})
+process.on('SIGQUIT', () => {	//keyboard quit
+	console.log('\n'+ dateLog()+ ' Deconnexion...')
+	client.destroy()
+})
+process.on('SIGTERM', () => {	// 'kill' command
+	console.log('\n'+ dateLog()+ ' Deconnexion...')
+	client.destroy()
+})
+
