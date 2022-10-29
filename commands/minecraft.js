@@ -70,30 +70,30 @@ module.exports = {
 
 
 		//! Certificat localhost, pour communiquer avec l'API en HTTPS
-		try {
-			var httpsAgent = new https.Agent({
-				ca: fs.readFileSync("./cert/localhost.crt")
-				// requestCert: true, rejectUnauthorized: true
-			})
-		}
-		catch (err) {	//Certificat introuvable
-			if (err.code == 'ENOENT') {	//NO ENTry, No such file or directory
-				console.error(dateLog()+ " Erreur: le certificat de communication avec l'API minecraft n'a pas été trouvé")
-				interaction.fetchReply()
-				.then(message => {
-					interaction.editReply("⚠️ Impossible de communiquer avec l'API: Certificat local introuvable")
-				})
-			}
-			else {	//Toute autre erreur
-				console.error(dateLog()+ " Erreur non traitée: "+ err);
-				interaction.fetchReply()
-				.then(message => {
-					interaction.editReply("⚠️ Erreur non traitée: contactez un administrateur, et verifiez la console")
-				})
+		// // try {
+		// // 	var httpsAgent = new https.Agent({
+		// // 		ca: fs.readFileSync("./cert/localhost.crt")
+		// // 		// requestCert: true, rejectUnauthorized: true
+		// // 	})
+		// // }
+		// // catch (err) {	//Certificat introuvable
+		// // 	if (err.code == 'ENOENT') {	//NO ENTry, No such file or directory
+		// // 		console.error(dateLog()+ " Erreur: le certificat de communication avec l'API minecraft n'a pas été trouvé")
+		// // 		interaction.fetchReply()
+		// // 		.then(message => {
+		// // 			interaction.editReply("⚠️ Impossible de communiquer avec l'API: Certificat local introuvable")
+		// // 		})
+		// // 	}
+		// // 	else {	//Toute autre erreur
+		// // 		console.error(dateLog()+ " Erreur non traitée: "+ err);
+		// // 		interaction.fetchReply()
+		// // 		.then(message => {
+		// // 			interaction.editReply("⚠️ Erreur non traitée: contactez un administrateur, et verifiez la console")
+		// // 		})
 				
-			} 
-			return;
-		}
+		// // 	} 
+		// // 	return;
+		// // }
 		
 		//hash du token, pour l'envoi en tant que token d'acces à l'API
 		hash = crypto.createHash('sha256');
@@ -112,7 +112,7 @@ module.exports = {
 				// token: interaction.client.token
 				// token: ''
 			},
-			httpsAgent: httpsAgent,
+			// // httpsAgent: httpsAgent,
 			headers: {
 				'Content-Type': 'application/json',
 			}
