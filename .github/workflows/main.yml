@@ -11,12 +11,5 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Deploy to Debian Server
-        uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          source: ./dist/ # Chemin local du répertoire à déployer
-          target: ${{ secrets.TARGET_FOLDER }} # Chemin distant du répertoire de déploiement
+          path: ${{ secrets.TARGET_FOLDER }}
