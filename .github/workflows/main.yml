@@ -1,0 +1,16 @@
+name: Deploy to Debian Server
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest 
+
+    steps:
+#      - name: Checkout code
+      - uses: actions/checkout@v3
+      - run: cd ${{ secrets.TARGET_FOLDER }}
+      - run: git fetch
+      - run: git pull
