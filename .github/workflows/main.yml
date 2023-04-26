@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted 
+    runs-on: web-deploy-test 
 
     steps:
       - name: Checkout code
